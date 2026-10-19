@@ -27,14 +27,16 @@ interface ToolResult {
   details: Record<string, unknown> | null;
 }
 
-function ok(payload: unknown, details: Record<string, unknown> = {}): ToolResult {
-  return { content: [{ type: "text", text: JSON.stringify(payload, null, 2) }], details };
+function ok(payload: Record<string, unknown>, details: Record<string, unknown> = {}): ToolResult {
+  // Code Mode exposes details rather than content. Preserve the already-marked
+  // payload in both representations, alongside the existing action metadata.
+  return { content: [{ type: "text", text: JSON.stringify(payload, null, 2) }], details: { ...details, ...payload } };
 }
 
 function fail(e: unknown, action: string): ToolResult {
   const code = e instanceof CalDavError ? e.code : "server_error";
   const message = e instanceof Error ? e.message : String(e);
-  return { content: [{ type: "text", text: JSON.stringify({ success: false, error: { code, message } }, null, 2) }], details: { action, errorCode: code } };
+  return ok({ success: false, error: { code, message } }, { action, errorCode: code });
 }
 
 const pluginEntry: OpenClawPluginDefinition = definePluginEntry({
