@@ -9,7 +9,11 @@ import { CalDavError } from "./errors.js";
 import { isValidTimeZone } from "./ical/tz.js";
 
 export interface SecretRef {
-  source: "env" | "file";
+  /**
+   * OpenClaw resolves these before the plugin is activated. The local env/file
+   * fallback below remains for compatibility with pre-SecretRef gateways.
+   */
+  source: "env" | "file" | "exec" | "store";
   provider: string;
   id: string;
 }

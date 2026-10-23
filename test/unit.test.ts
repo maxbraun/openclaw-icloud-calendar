@@ -6,6 +6,7 @@ import { expandRrule, recurrenceToRrule, rruleToRecurrence } from "../src/ical/r
 import { buildNewEvent, componentToEvent, parseEventDocument, patchEvent, triggerToMinutes, minutesToTrigger } from "../src/ical/event.js";
 import { isSuspicious, markEvent } from "../src/sanitize.js";
 import { jsonPointer, resolveConfig } from "../src/config.js";
+import manifest from "../openclaw.plugin.json" with { type: "json" };
 
 const TZ = "America/Los_Angeles";
 
@@ -363,6 +364,17 @@ describe("sanitize", () => {
 });
 
 describe("config", () => {
+  it("declares appPassword as a gateway-managed SecretRef capability", () => {
+    expect(manifest.configContracts.secretInputs.paths).toContainEqual({
+      path: "appPassword",
+      expected: "string",
+      ownerKind: "capability",
+    });
+    const appPassword = manifest.configSchema.properties.appPassword;
+    const secretRef = appPassword.oneOf[1];
+    expect(secretRef.properties.source.enum).toEqual(["env", "file", "exec", "store"]);
+  });
+
   it("resolves plain, env-interpolated and env-fallback values, and validates tz", () => {
     process.env.TEST_ICLOUD_PW = "pw";
     const c = resolveConfig({ appleId: "a@b.com", appPassword: "${TEST_ICLOUD_PW}", timezone: TZ });

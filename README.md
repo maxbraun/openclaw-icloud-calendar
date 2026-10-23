@@ -55,9 +55,17 @@ openclaw plugins install clawhub:openclaw-icloud-calendar
    }
    ```
 
-   `appPassword` also accepts a SecretRef (`{"source":"env","provider":"env","id":"ICLOUD_APP_PASSWORD"}`
-   or `{"source":"file","provider":"secrets","id":"/icloud/appPassword"}` pointing into
-   `~/.openclaw/secrets.json`). Plain strings work but are discouraged.
+   `appPassword` also accepts an OpenClaw SecretRef. The gateway resolves the
+   reference before the plugin activates, so `env`, `file`, `exec`, and `store`
+   providers all work without exposing the app-specific password in
+   `openclaw.json`. For example:
+
+   ```json
+   {"source":"env","provider":"default","id":"ICLOUD_APP_PASSWORD"}
+   ```
+
+   Plain strings work but are discouraged. See the OpenClaw secrets guide for
+   provider configuration and the SecretRef contract.
 
    Without any config, the plugin falls back to `ICLOUD_APPLE_ID` and `ICLOUD_APP_PASSWORD`
    environment variables.
@@ -67,7 +75,7 @@ openclaw plugins install clawhub:openclaw-icloud-calendar
 | Key | Type | Default | Notes |
 |-----|------|---------|-------|
 | `appleId` | string | | Apple Account email. Required. |
-| `appPassword` | string / `${ENV}` / SecretRef | | App-specific password. Required. Never your Apple Account password. |
+| `appPassword` | string / `${ENV}` / SecretRef | | App-specific password. Required. OpenClaw `env`, `file`, `exec`, and `store` SecretRefs are supported. Never your Apple Account password. |
 | `timezone` | IANA string | host time zone | Used to interpret naive times the agent sends and to format results. |
 | `serverUrl` | string | `https://caldav.icloud.com` | Must be `https`. Any CalDAV server that speaks the same dialect should work, but iCloud is what is tested. |
 | `calendars` | string[] | all | Allowlist of calendar ids or names the agent may see and modify. |

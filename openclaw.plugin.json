@@ -1,13 +1,24 @@
 {
   "id": "openclaw-icloud-calendar",
   "name": "iCloud Calendar",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Read and write Apple iCloud Calendar over CalDAV using an Apple ID and app-specific password. Server-to-server; no macOS required.",
   "skills": [
     "skills/icloud-calendar"
   ],
   "activation": {
     "onStartup": true
+  },
+  "configContracts": {
+    "secretInputs": {
+      "paths": [
+        {
+          "path": "appPassword",
+          "expected": "string",
+          "ownerKind": "capability"
+        }
+      ]
+    }
   },
   "configSchema": {
     "type": "object",
@@ -30,7 +41,9 @@
                 "type": "string",
                 "enum": [
                   "env",
-                  "file"
+                  "file",
+                  "exec",
+                  "store"
                 ]
               },
               "provider": {
